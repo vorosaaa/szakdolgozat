@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" content="width=device-width, initial-scale=1" name="viewport">
+    <link href="/css/main.css" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css"
+          rel="stylesheet"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+</head>
+<body>
+
+<form id="logoutForm" method="POST" th:action="@{/logout}">
+    <input name="${_csrf.parameterName}" type="hidden" value="${_csrf.token}"/>
+</form>
+
+<div class="sidebar">
+    <a class="active" href="#">My Tasks</a>
+    <a href="#">Flows</a>
+    <a th:href="@{/groups}">Group</a>
+    <a th:href="@{/myprofile}">My Profile</a>
+</div>
+
+<div class="content">
+    <h1>MY TASKS</h1>
+    <a onclick="document.forms['logoutForm'].submit()">Logout</a>
+    <div class="flex-container tasks">
+        <div class="tasks__task">
+            <div class="login-title task--title">halimaliho</div>
+            <div class="login-field task--field">
+                <div>ebbol vajon</div>
+                <div>mi lesz??</div>
+            </div>
+        </div>
+        <a th:each="task : ${taskList}" th:href="@{/task/{id}(id=${task.id})}">
+            <div class="tasks__task">
+                <div class="login-title task--title" th:text="${task.name}"></div>
+                <div class="login-field task--field" th:text="${task.description}"></div>
+                <div class="login-field task--field"
+                     th:text="${task.finished} ? Voting finished : Voting unfinished"></div>
+            </div>
+        </a>
+    </div>
+</div>
+</body>
+</html>

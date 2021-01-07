@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <link href="/css/main.css" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css"
+          rel="stylesheet"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+    <title>cucc</title>
+</head>
+<body>
+
+<div class="flex-container">
+    <div class="login">
+        <div class="login-title">
+            Please login
+        </div>
+        <form action="#" method="POST" th:action="@{/login}">
+            <div class="login-field">
+                <input autofocus="true" class="input-upper" name="username" placeholder="userDTO@example.com"
+                       type="text"/>
+
+                <input name="password" placeholder="Password" type="password"/>
+                <span class="has-error" th:text="${error}"></span>
+
+                <input name="${_csrf.parameterName}" type="hidden" value="${_csrf.token}"/>
+
+                <div class="login-field__submit">
+                    <button class="submit__button" name="login" type="submit">Login</button>
+                    <button class="submit__button" name="register" th:onclick="window.location.href='registration'"
+                            type="button">Register
+                    </button>
+
+                    <a href="https://www.google.com/">Forgotten password?</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" content="width=device-width, initial-scale=1" name="viewport">
+    <link href="/css/main.css" rel="stylesheet"/>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css"
+          rel="stylesheet"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+</head>
+<body>
+
+<form id="logoutForm" method="POST" th:action="@{/logout}">
+    <input name="${_csrf.parameterName}" type="hidden" value="${_csrf.token}"/>
+</form>
+
+<div class="sidebar">
+    <a th:href="@{/taskList}">My Tasks</a>
+    <a href="#">Flows</a>
+    <a class="active" href="#">Group</a>
+    <a th:href="@{/myprofile}">My Profile</a>
+</div>
+
+<div class="content">
+    <h1> [[${group.name}]]
+        <button class="content__add-button" id="addButton"><i class='fas fa-plus'></i></button>
+    </h1>
+
+    <a onclick="document.forms['logoutForm'].submit()">Logout</a>
+
+    <!-- The Modal -->
+    <div class="group__popup" id="popup">
+        <!-- Modal content -->
+        <div class="popup-content">
+            <div class="popup-header">
+                <span class="close">&times;</span>
+                <h2>Create new group</h2>
+            </div>
+            <div class="popup-body">
+                <form enctype="utf8" method="POST" th:action="@{/saveTask}" th:object="${taskObj}">
+                    <p>Name</p>
+                    <input placeholder="Task name" th:field="*{name}" type="text">
+                    <p>Description</p>
+                    <input placeholder="Task description" th:field="*{description}" type="text">
+                    <input th:name="groupVar" th:value="${group.id}" type="hidden"/>
+                    <div class="login-field__submit">
+                        <button class="submit__button button__register" type="submit">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="flex-container tasks">
+        <div class="tasks__task" th:each="task: ${taskList}">
+            <div class="login-title task--title" th:text="${task.name}"></div>
+            <div class="login-field task--field">
+                <div th:if="${task.voteFinished}">Assigned user:
+                    <p th:text="${task.assignedUser}"></p>
+                </div>
+                <div th:switch="${task.statusEnum}">
+                    <p th:case="${T(org.ati.core.model.StatusEnum).IN_PROGRESS}">IN PROGRESS</p>
+                    <p th:case="${T(org.ati.core.model.StatusEnum).DONE}">DONE</p>
+                </div>
+                <div>Description:
+                    <p th:text="${task.description}"></p>
+                </div>
+                <form enctype="utf8" method="POST" th:action="@{/vote/{id}(id=${task.id}}">
+                    <input name="vote" th:each="member : ${members}" th:if="votedFor.id == member.id ? 'checked'"
+                           th:text="${member.name}" th:value="${member.id}" type="checkbox"/>
+                    <button class="submit__button button__register" type="submit">Vote</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+
+</body>
+</html>

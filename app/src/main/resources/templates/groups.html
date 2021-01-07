@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" content="width=device-width, initial-scale=1" name="viewport">
+    <link href="/css/main.css" rel="stylesheet"/>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css"
+          rel="stylesheet"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+
+</head>
+<body>
+
+<form id="logoutForm" method="POST" th:action="@{/logout}">
+    <input name="${_csrf.parameterName}" type="hidden" value="${_csrf.token}"/>
+</form>
+
+<div class="sidebar">
+    <a th:href="@{/taskList}">My Tasks</a>
+    <a href="#">Flows</a>
+    <a class="active" href="#">Group</a>
+    <a th:href="@{/myprofile}">My Profile</a>
+</div>
+
+<div class="content">
+    <h1>MY GROUPS
+        <button class="content__add-button" id="addButton"><i class='fas fa-plus'></i></button>
+    </h1>
+
+    <a onclick="document.forms['logoutForm'].submit()">Logout</a>
+
+    <!-- The Modal -->
+    <div class="group__popup" id="popup">
+        <!-- Modal content -->
+        <div class="popup-content">
+            <div class="popup-header">
+                <span class="close">&times;</span>
+                <h2>Create new group</h2>
+            </div>
+            <div class="popup-body">
+                <form enctype="utf8" method="POST" th:action="@{/saveGroup}" th:object="${group}">
+                    <input placeholder="Group name" th:field="*{name}" type="text">
+                    <div>
+                        <select class="selectpicker" data-live-search="true" multiple name="usersOfGroup">
+                            <option disabled>Choose users</option>
+                            <option th:each="user : ${users}" th:text="${user.username}" th:value="${user.id}"></option>
+                        </select>
+                    </div>
+                    <div class="login-field__submit">
+                        <button class="submit__button button__register" type="submit">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex-container tasks">
+        <div class="tasks__task groups__group">
+            <a th:each="group : ${groups}" th:href="@{/groups/{id}(id=${group.id})}">
+                <div class="login-title task--title group__title" th:text="${group.name}"></div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+
+</body>
+</html>

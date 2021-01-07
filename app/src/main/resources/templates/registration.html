@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <link href="/css/main.css" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css"
+          rel="stylesheet"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+    <title>cucc</title>
+</head>
+<body>
+
+<div class="flex-container">
+    <div class="login register">
+        <div class="login-title reg_title">
+            Register please
+        </div>
+        <div class="login-field reg_field">
+            <form enctype="utf8" method="POST" th:action="@{/registration}" th:object="${userForm}">
+                <input placeholder="Voros Attila" th:field="*{name}" type="text"/>
+                <input placeholder="Akarmi121-.," th:field="*{username}" type="text"/>
+                <span class="has-error" th:errors="*{username}" th:if="${#fields.hasErrors('username')}"></span>
+
+                <input placeholder="Password" th:field="*{password}" type="password"/>
+                <input placeholder="Confirm your password" th:field="*{matchingPassword}" type="password"/>
+                <span class="has-error" th:errors="*{matchingPassword}"
+                      th:if="${#fields.hasErrors('matchingPassword')}"></span>
+
+                <div class="login-field__submit">
+                    <button class="submit__button button__register" type="submit">Register</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
