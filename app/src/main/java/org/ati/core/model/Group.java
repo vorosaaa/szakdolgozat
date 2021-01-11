@@ -1,37 +1,28 @@
 package org.ati.core.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity(name = "USERGROUP")
+@Data
 public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Getter
-    @Setter
     @Column(unique = true)
     private Long id;
 
-    @Getter
-    @Setter
     private String name;
 
-    @Getter
-    @Setter
+
     @ManyToMany
     private Set<UserDTO> members;
 
-    @Getter
-    @Setter
     @OneToMany
     private Set<Task> tasks;
 
-    @Getter
-    @Setter
     @OneToOne(targetEntity = Flow.class, fetch = FetchType.EAGER)
     private Flow assignedFlow;
 

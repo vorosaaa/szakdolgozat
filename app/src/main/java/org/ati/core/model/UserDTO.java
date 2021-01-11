@@ -3,8 +3,7 @@ package org.ati.core.model;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,65 +13,51 @@ import java.util.*;
 
 @Entity
 @Table(name = "USERDTO")
+@Data
 public class UserDTO implements UserDetails {
 
     @Builder.Default
     private final UserRole userRole = UserRole.USER;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Getter
-    @Setter
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true)
     private Long id;
-    @Getter
-    @Setter
+
     @NotNull
     @NotEmpty
     private String name;
     @NotNull
     @NotEmpty
-    @Setter
     private String username;
 
     @NotNull
     @NotEmpty
-    @Setter
     private String password;
-    @Getter
-    @Setter
+
     @NotNull
     @NotEmpty
     private String email;
     @Transient
-    @Getter
-    @Setter
+
     @NotNull
     @NotEmpty
     private String matchingPassword;
 
-    @Getter
-    @Setter
+
     @ElementCollection
     private Map<Task, String> stats;
-    @Getter
-    @Setter
+
     @ManyToMany(targetEntity = Skills.class)
     private Set<Skills> skillSet;
 
-    @Getter
-    @Setter
     @ElementCollection
     private Map<Task, UserDTO> votedFor;
 
-    @Getter
-    @Setter
     @ManyToMany
     @JoinColumn(name = "group_id", nullable = true)
     private Set<Group> group;
-    @Setter
     @Builder.Default
     private Boolean locked = false;
-    @Setter
     @Builder.Default
     private Boolean enabled = false;
 

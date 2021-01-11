@@ -40,7 +40,7 @@
         <div class="popup-content">
             <div class="popup-header">
                 <span class="close">&times;</span>
-                <h2>Create new group</h2>
+                <h2>Create new task</h2>
             </div>
             <div class="popup-body">
                 <form enctype="utf8" method="POST" th:action="@{/saveTask}" th:object="${taskObj}">
@@ -59,7 +59,7 @@
 
 
     <div class="flex-container tasks">
-        <div class="tasks__task" th:each="task: ${taskList}">
+        <div class="tasks__task" th:each="task : ${taskList}">
             <div class="login-title task--title" th:text="${task.name}"></div>
             <div class="login-field task--field">
                 <div th:if="${task.voteFinished}">Assigned user:
@@ -72,11 +72,11 @@
                 <div>Description:
                     <p th:text="${task.description}"></p>
                 </div>
-                <form enctype="utf8" method="POST" th:action="@{/vote/{id}(id=${task.id}}">
-                    <input name="vote" th:each="member : ${members}" th:if="votedFor.id == member.id ? 'checked'"
-                           th:text="${member.name}" th:value="${member.id}" type="checkbox"/>
-                    <button class="submit__button button__register" type="submit">Vote</button>
-                </form>
+                <input name="vote" th:each="member : ${members}" th:if="votedFor.id == member.id ? 'checked'"
+                       th:text="${member.name}" th:value="${member.id}" type="checkbox"/>
+                <a th:href="@{/task/{id}(id=${task.id})}">
+                    <button class="submit__button button__register" type="submit">Redirect</button>
+                </a>
             </div>
         </div>
     </div>

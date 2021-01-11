@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
+import java.util.Map;
 
 @Controller
 public class TaskController {
@@ -53,21 +54,36 @@ public class TaskController {
 
         if (request.getParameter("vote") != null) {
             UserDTO votedUser = userService.getOne(Long.parseLong(request.getParameter("vote")));
-
-            userDTO.getVotedFor().put(task, votedUser);
-            if (task.getVotes().containsKey(votedUser)) {
-                task.getVotes().replace(votedUser, task.getVotes().get(votedUser) + 1);
+            UserDTO previousVote = userDTO.getVotedFor().get(task);
+            if (previousVote == null) {
+                userDTO.getVotedFor().put(task, votedUser);
+                if (task.getVotes().containsKey(votedUser)) {
+                    int prevVote = task.getVotes().get(votedUser);
+                    task.getVotes().replace(votedUser, prevVote + 1);
+                } else {
+                    task.getVotes().put(votedUser, 1);
+                }
+                task.getAuthenticatedUserVoted().put(userDTO, true);
             } else {
-                task.getVotes().put(votedUser, 1);
+                if (votedUser != previousVote) {
+                    task.getVotes().replace(previousVote, task.getVotes().get(previousVote) - 1);
+                    userDTO.getVotedFor().replace(task, votedUser);
+                    if (task.getVotes().containsKey(votedUser)) {
+                        int prevVote = task.getVotes().get(votedUser);
+                        task.getVotes().replace(votedUser, prevVote + 1);
+                    } else {
+                        task.getVotes().put(votedUser, 1);
+                    }
+                }
             }
-            task.getAuthenticatedUserVoted().put(userDTO, true);
         }
-        userService.save(userDTO);
-        taskService.save(task);
 
-        model.addAttribute("task", task);
-        model.addAttribute("members", task.getGroup().getMembers());
-        model.addAttribute("votedFor", userDTO.getVotedFor().get(task));
+        for (Map.Entry<UserDTO, Integer> entry : task.getVotes().entrySet()) {
+            System.out.println(entry.getKey().getUsername());
+            System.out.println((entry.getValue()));
+        }
+        taskService.save(task);
+        userService.save(userDTO);
 
         return "redirect:/task/" + id;
     }
