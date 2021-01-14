@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
-import java.util.Map;
 
 @Controller
 public class TaskController {
@@ -77,11 +76,7 @@ public class TaskController {
                 }
             }
         }
-
-        for (Map.Entry<UserDTO, Integer> entry : task.getVotes().entrySet()) {
-            System.out.println(entry.getKey().getUsername());
-            System.out.println((entry.getValue()));
-        }
+        task.setVoteFinished(task.getVotes().size() == task.getGroup().getMembers().size());
         taskService.save(task);
         userService.save(userDTO);
 

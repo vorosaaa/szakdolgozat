@@ -96,6 +96,10 @@ html, body {
     border-radius: 0;
 }
 
+.button__task__submit {
+    width: 50%;
+}
+
 /******************MY PROFILE PAGE*********************/
 
 .button__save {
@@ -180,100 +184,101 @@ div.content {
 }
 
 .inputGroup {
-    background-color: #fff !important;
-    display: block !important;
-    margin: 10px 0 !important;
-    position: relative !important;
-    border: 2px solid black;
+  width: 44%;
+  background-color: #fff;
+  display: block;
+  margin: 12px 22px;
+  position: relative;
 }
-
-.inputGroup > input {
-    width: 32px !important;
-    height: 32px !important;
-    order: 1 !important;
-    z-index: 2 !important;
-    position: absolute !important;
-    right: 30px !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    cursor: pointer !important;
-    visibility: hidden !important;
+.inputGroup label {
+  padding: 12px 30px;
+  width: 100%;
+  display: block;
+  text-align: left;
+  color: #3C454C;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+  transition: color 200ms ease-in;
+  overflow: hidden;
 }
-
-.inputGroup > label {
-    padding: 12px 30px !important;
-    width: 100% !important;
-    display: block !important;
-    text-align: left !important;
-    color: #3C454C !important;
-    cursor: pointer !important;
-    position: relative !important;
-    z-index: 2 !important;
-    transition: color 200ms ease-in !important;
-    overflow: hidden !important;
+.inputGroup label:before {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  content: "";
+  background-color: #4CAF50;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale3d(1, 1, 1);
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  z-index: -1;
 }
-.inputGroup > input::after {
-    width: 32px !important;
-    height: 32px !important;
-    content: '' !important;
-    border: 2px solid #D1D7DC !important;
-    background-color: #fff !important;
-    background-image: url("data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5.414 11L4 12.414l5.414 5.414L20.828 6.414 19.414 5l-10 10z' fill='%23fff' fill-rule='nonzero'/%3E%3C/svg%3E ") !important;
-    background-repeat: no-repeat !important;
-    background-position: 2px 3px !important;
-    border-radius: 50% !important;
-    z-index: 2 !important;
-    position: absolute !important;
-    right: 30px !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    cursor: pointer !important;
-    transition: all 200ms ease-in !important;
+.inputGroup label:after {
+  width: 32px;
+  height: 32px;
+  content: "";
+  border: 2px solid #D1D7DC;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5.414 11L4 12.414l5.414 5.414L20.828 6.414 19.414 5l-10 10z' fill='%23fff' fill-rule='nonzero'/%3E%3C/svg%3E ");
+  background-repeat: no-repeat;
+  background-position: 2px 3px;
+  border-radius: 50%;
+  z-index: 2;
+  position: absolute;
+  right: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  transition: all 200ms ease-in;
 }
-.inputGroup > input::before {
-    width: 10px !important;
-    height: 10px !important;
-    border-radius: 50% !important;
-    content: '' !important;
-    background-color: #5562eb !important;
-    position: absolute !important;
-    left: 50% !important;
-    top: 50% !important;
-    transform: translate(-50%, -50%) scale3d(1, 1, 1) !important;
-    transition: all 300ms cubic-bezier(0.4, 0.0, 0.2, 1) !important;
-    opacity: 0 !important;
-    z-index: -1 !important;
+.inputGroup input:checked ~ label {
+  color: #fff;
 }
-
-.inputGroup > input::checked ~ label {
-    color: #fff !important;
+.inputGroup input:checked ~ label:before {
+  transform: translate(-50%, -50%) scale3d(56, 56, 1);
+  opacity: 1;
 }
-.inputGroup > input::checked ~ label::before {
-    transform: translate(-50%, -50%) scale3d(56, 56, 1) !important;
-    opacity: 1 !important;
+.inputGroup input:checked ~ label:after {
+  background-color: #4CAF50;
+  border-color: #4CAF50;
 }
-.inputGroup > input::checked ~ label::after {
-    background-color: #54E0C7 !important;
-    border-color: #54E0C7 !important;
+.inputGroup input {
+  width: 32px;
+  height: 32px;
+  order: 1;
+  z-index: 2;
+  position: absolute;
+  right: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  visibility: hidden;
 }
 
 .form {
-  padding: 0 16px !important;
-  max-width: 550px !important;
-  margin: 50px auto !important;
-  font-size: 18px !important;
-  font-weight: 600 !important;
-  line-height: 36px !important;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  width: 100%;
+  margin: auto auto;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 36px;
 }
 
-.form input {
-    height: auto !important;
+body {
+  background-color: #D1D7DC;
+  font-family: "Fira Sans", sans-serif;
 }
 
 *,
 *::before,
 *::after {
-  box-sizing: inherit !important;
+  box-sizing: inherit;
 }
 
 html {
@@ -283,6 +288,12 @@ html {
 code {
   background-color: #9AA3AC !important;
   padding: 0 8px !important;
+}
+
+.submit__button__holder {
+    text-align: center;
+    width: 100%;
+    height: 100%;
 }
 
 /********Groups*******/

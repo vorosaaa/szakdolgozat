@@ -3,7 +3,8 @@ package org.ati.core.model;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,7 +14,6 @@ import java.util.*;
 
 @Entity
 @Table(name = "USERDTO")
-@Data
 public class UserDTO implements UserDetails {
 
     @Builder.Default
@@ -21,44 +21,62 @@ public class UserDTO implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true)
+    @Getter
+    @Setter
     private Long id;
 
     @NotNull
     @NotEmpty
+    @Getter
+    @Setter
     private String name;
     @NotNull
     @NotEmpty
+    @Setter
     private String username;
 
     @NotNull
     @NotEmpty
+    @Setter
     private String password;
 
     @NotNull
     @NotEmpty
+    @Getter
+    @Setter
     private String email;
     @Transient
-
     @NotNull
     @NotEmpty
+    @Getter
+    @Setter
     private String matchingPassword;
 
-
     @ElementCollection
+    @Getter
+    @Setter
     private Map<Task, String> stats;
 
     @ManyToMany(targetEntity = Skills.class)
+    @Getter
+    @Setter
     private Set<Skills> skillSet;
 
     @ElementCollection
+    @Getter
+    @Setter
     private Map<Task, UserDTO> votedFor;
 
     @ManyToMany
     @JoinColumn(name = "group_id", nullable = true)
+    @Getter
+    @Setter
     private Set<Group> group;
     @Builder.Default
+    @Setter
     private Boolean locked = false;
     @Builder.Default
+    @Setter
     private Boolean enabled = false;
 
     public UserDTO() {

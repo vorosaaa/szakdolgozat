@@ -2,7 +2,8 @@ package org.ati.core.model;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.HashMap;
@@ -11,36 +12,54 @@ import java.util.Map;
 import java.util.Set;
 
 @Entity(name = "TASK")
-@Data
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
+    @Getter
+    @Setter
     private Long id;
 
     @NotNull
     @NotEmpty
+    @Getter
+    @Setter
     private String name;
 
+    @Getter
+    @Setter
     private String description;
 
+    @Getter
+    @Setter
     @ManyToMany
     private Set<Skills> requiredSkills;
 
+    @Getter
+    @Setter
     @ManyToOne
     private Group group;
 
+    @Getter
+    @Setter
     @ManyToOne(targetEntity = UserDTO.class, fetch = FetchType.EAGER)
     private UserDTO assignedUser;
 
     @ElementCollection
+    @Getter
+    @Setter
     private Map<UserDTO, Integer> votes;
 
     @ElementCollection
+    @Getter
+    @Setter
     private Map<UserDTO, Boolean> authenticatedUserVoted;
 
+    @Getter
+    @Setter
     private boolean voteFinished;
 
+    @Getter
+    @Setter
     private StatusEnum statusEnum;
 
     public Task() {

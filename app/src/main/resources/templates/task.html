@@ -50,18 +50,9 @@
                         <input th:id="${member.name}" th:name="vote" th:value="${member.id}" type="radio">
                         <label th:for="${member.name}"><p th:text="${member.name}"></p></label>
                     </div>
-                    <button class="submit__button button__register" type="submit">Vote</button>
-
-
-                    <!--                    <div class="container">-->
-                    <!--                        <ul class="ks-cboxtags">-->
-                    <!--                            <li th:each="member : ${members}">-->
-                    <!--                                <input type="checkbox"  th:value="${member.id}" name="vote" th:id="${member.name}" >-->
-                    <!--                                <label th:for="${member.name}"><p th:text="${member.name}"></p></label>-->
-                    <!--                            </li>-->
-                    <!--                        </ul>-->
-                    <!--                    </div>-->
-                    <!--                    <button class="submit__button button__register" type="submit">Vote</button>-->
+                    <div class="submit__button__holder">
+                        <button class="submit__button button__register button__task__submit" type="submit">Vote</button>
+                    </div>
                 </form>
             </div>
         </div>

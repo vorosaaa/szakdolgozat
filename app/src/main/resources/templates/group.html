@@ -70,7 +70,7 @@
                     <p th:case="${T(org.ati.core.model.StatusEnum).DONE}">DONE</p>
                 </div>
                 <div>Description:
-                    <p th:text="${task.description}"></p>
+                    <span th:text="${task.description}"></span>
                 </div>
                 <input name="vote" th:each="member : ${members}" th:if="votedFor.id == member.id ? 'checked'"
                        th:text="${member.name}" th:value="${member.id}" type="checkbox"/>
