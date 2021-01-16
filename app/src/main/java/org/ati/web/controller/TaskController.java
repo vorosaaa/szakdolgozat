@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 @Controller
 public class TaskController {
@@ -38,10 +41,15 @@ public class TaskController {
     @GetMapping("/task/{id}")
     public String getTask(Model model, @PathVariable Long id, Principal principal) {
         Task task = taskService.getOne(id);
+        List<UserDTO> list = new ArrayList<>(task.getGroup().getMembers());
+        list.sort(Comparator.comparing(UserDTO::getName));
+        boolean voted = task.getAuthenticatedUserVoted().get(userService.findByUsername(principal.getName())) != null && task.getAuthenticatedUserVoted().get(userService.findByUsername(principal.getName()));
 
         model.addAttribute("task", task);
-        model.addAttribute("members", task.getGroup().getMembers());
+        model.addAttribute("members", list);
         model.addAttribute("votedFor", userService.findByUsername(principal.getName()).getVotedFor().get(task));
+        model.addAttribute("voted", voted);
+
 
         return "task";
     }

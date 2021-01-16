@@ -47,7 +47,10 @@
                 </div>
                 <form class="form" enctype="utf8" method="POST" th:action="@{/vote/{id}(id=${task.id})}">
                     <div class="inputGroup" th:each="member : ${members}">
-                        <input th:id="${member.name}" th:name="vote" th:value="${member.id}" type="radio">
+                        <input th:id="${member.name}" th:if="${!voted}" th:name="vote" th:value="${member.id}"
+                               type="radio">
+                        <input th:checked="${votedFor.id} == ${member.id}" th:id="${member.name}" th:if="${voted}"
+                               th:name="vote" th:value="${member.id}" type="radio">
                         <label th:for="${member.name}"><p th:text="${member.name}"></p></label>
                     </div>
                     <div class="submit__button__holder">
