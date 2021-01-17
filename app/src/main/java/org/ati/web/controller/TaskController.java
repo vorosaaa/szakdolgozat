@@ -41,15 +41,15 @@ public class TaskController {
     @GetMapping("/task/{id}")
     public String getTask(Model model, @PathVariable Long id, Principal principal) {
         Task task = taskService.getOne(id);
+        UserDTO currentUser = userService.findByUsername(principal.getName());
         List<UserDTO> list = new ArrayList<>(task.getGroup().getMembers());
         list.sort(Comparator.comparing(UserDTO::getName));
-        boolean voted = task.getAuthenticatedUserVoted().get(userService.findByUsername(principal.getName())) != null && task.getAuthenticatedUserVoted().get(userService.findByUsername(principal.getName()));
+        boolean voted = task.getAuthenticatedUserVoted().get(currentUser) != null && task.getAuthenticatedUserVoted().get(currentUser);
 
         model.addAttribute("task", task);
         model.addAttribute("members", list);
-        model.addAttribute("votedFor", userService.findByUsername(principal.getName()).getVotedFor().get(task));
+        model.addAttribute("votedFor", currentUser.getVotedFor().get(task));
         model.addAttribute("voted", voted);
-
 
         return "task";
     }

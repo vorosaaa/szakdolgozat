@@ -8,6 +8,10 @@ html, body {
     justify-content: center;
     height: 100%;
 }
+.container__top {
+    height: 8%;
+    justify-content: space-between;
+}
 
 .login {
     width: 25%;

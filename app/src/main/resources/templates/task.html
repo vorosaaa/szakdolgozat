@@ -28,9 +28,12 @@
 </div>
 
 <div class="content">
-    <h1 th:text="${task.name}"></h1>
-
-    <a onclick="document.forms['logoutForm'].submit()">Logout</a>
+    <div class="flex-container container__top">
+        <h1 th:text="${task.name}"></h1>
+        <a onclick="document.forms['logoutForm'].submit()">
+            <button class="submit__button button__cancel">Logout</button>
+        </a>
+    </div>
 
     <div class="flex-container tasks">
         <div class="tasks__task task__edit">
