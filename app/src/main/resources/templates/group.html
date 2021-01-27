@@ -52,10 +52,19 @@
                     <p>Description</p>
                     <input placeholder="Task description" th:field="*{description}" type="text">
                     <input th:name="groupVar" th:value="${group.id}" type="hidden"/>
-                    <input type="radio" th:field="*{typeEnum}" th:value="${T(org.ati.core.model.SystemConstants.TypeEnum).QUESTION}" th:text="Question"/>
-                    <input type="radio" th:field="*{typeEnum}" th:value="${T(org.ati.core.model.SystemConstants.TypeEnum).TASK}" th:text="Task"/>
-                    <div class="login-field__submit">
-                        <button class="submit__button button__register" type="submit">Create</button>
+                    <div class="form">
+                        <div class="inputGroup">
+                            <input type="radio" th:id="question"th:field="*{typeEnum}" th:value="${T(org.ati.core.model.SystemConstants.TypeEnum).QUESTION}" />
+                            <label th:for="question"><p th:text="Question"></p></label>
+                        </div>
+                        <div class="inputGroup">
+                            <input type="radio" th:id="task" th:field="*{typeEnum}" th:value="${T(org.ati.core.model.SystemConstants.TypeEnum).TASK}" />
+                            <label th:for="task"><p th:text="Task"></p></label>
+                        </div>
+                        <input type="datetime-local" id="inputDate" value="" th:field="*{validTo}" required/>
+                        <div class="login-field__submit">
+                            <button class="submit__button button__register" type="submit">Create</button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -86,6 +95,9 @@
 </div>
 
 <script src="/js/main.js"></script>
+<script>
+$("#inputDate").val(moment().add(1, 'days').hours(8).startOf('hour').format("YYYY-MM-DDTHH:mm:ss"));
+</script>
 
 </body>
 </html>
