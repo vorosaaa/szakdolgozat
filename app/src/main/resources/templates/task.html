@@ -42,13 +42,35 @@
                     <p th:text="${task.assignedUser}"></p>
                 </div>
                 <div th:switch="${task.statusEnum}">
-                    <h3 th:case="${T(org.ati.core.model.StatusEnum).IN_PROGRESS}">IN PROGRESS</h3>
-                    <h3 th:case="${T(org.ati.core.model.StatusEnum).DONE}">DONE</h3>
+                    <h3 th:case="${T(org.ati.core.model.SystemConstants.StatusEnum).IN_PROGRESS}">IN PROGRESS</h3>
+                    <h3 th:case="${T(org.ati.core.model.SystemConstants.StatusEnum).DONE}">DONE</h3>
                 </div>
-                <div><h3>Description:</h3>
+                <div class="left"><h3>Description:</h3>
                     <p th:text="${task.description}"></p>
                 </div>
-                <form class="form" enctype="utf8" method="POST" th:action="@{/vote/{id}(id=${task.id})}">
+                <h4 class="cleared">Choose an option or create one:</h4>
+                <form th:if="${question}" class="form" enctype="utf8" method="POST" th:action="@{/vote/{id}(id=${task.id})}">
+                    <div class="inputGroup" th:each="answer : ${optionals}">
+                        <input th:id="${answer}" th:if="${!answered}" th:name="answer" th:value="${answer}"
+                               type="radio">
+                        <input th:checked="${userAnswered} == ${answer}" th:id="${answer}" th:if="${answered}"
+                               th:name="answer" th:value="${answer}" type="radio">
+                        <label th:for="${answer}"><p th:text="${answer}"></p></label>
+                    </div>
+                    <input th:name="newAnswer" placeholder="New option" type="text">
+                    <div class="submit__button__holder">
+                        <button class="submit__button button__register button__task__submit" type="submit">Vote</button>
+                    </div>
+                </form>
+                <form th:if="${!question}" class="form" enctype="utf8" method="POST" th:action="@{/vote/{id}(id=${task.id})}">
+                    <div class="inputGroup" th:each="answer : ${optionals}">
+                        <input th:id="${answer}" th:if="${!answered}" th:name="answer" th:value="${answer}"
+                               type="radio">
+                        <input th:checked="${userAnswered} == ${answer}" th:id="${answer}" th:if="${answered}"
+                               th:name="answer" th:value="${answer}" type="radio">
+                        <label th:for="${answer}"><p th:text="${answer}"></p></label>
+                    </div>
+                    <input th:name="newAnswer" placeholder="New option" type="text">
                     <div class="inputGroup" th:each="member : ${members}">
                         <input th:id="${member.name}" th:if="${!voted}" th:name="vote" th:value="${member.id}"
                                type="radio">

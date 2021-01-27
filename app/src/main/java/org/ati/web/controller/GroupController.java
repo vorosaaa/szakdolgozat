@@ -38,6 +38,7 @@ public class GroupController {
         }
 
         model.addAttribute("users", userService.listAllUsers());
+        model.addAttribute("user", userService.findByUsername(principal.getName()).getUsername());
         model.addAttribute("groups", groupList);
 
         return "groups";
@@ -47,7 +48,7 @@ public class GroupController {
     public String addGroup(@ModelAttribute("group") Group group,
                            BindingResult result, Principal principal, HttpServletRequest request) {
         if (result.hasErrors()) {
-            return "redirect:/welcome";
+            return "redirect:/groups";
         }
 
         List<String> listOfIds = new ArrayList<>();
@@ -59,7 +60,7 @@ public class GroupController {
         for (String id : listOfIds) {
             group.getMembers().add(userService.getOne(Long.parseLong(id)));
         }
-
+        group.setAdmin(userService.findByUsername(principal.getName()));
         groupService.save(group);
         return "redirect:/groups";
     }
@@ -73,5 +74,15 @@ public class GroupController {
         model.addAttribute("members", group.getMembers());
 
         return ("group");
+    }
+
+    @PostMapping("/deleteGroup/{id}")
+    public String deleteGroup(@PathVariable Long id, Principal principal) {
+        Group group = groupService.getOne(id);
+        if (group.getAdmin() == userService.findByUsername(principal.getName())) {
+            groupService.deleteGroup(groupService.getOne(id));
+        }
+
+        return "redirect:/groups";
     }
 }

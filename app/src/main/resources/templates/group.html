@@ -52,6 +52,8 @@
                     <p>Description</p>
                     <input placeholder="Task description" th:field="*{description}" type="text">
                     <input th:name="groupVar" th:value="${group.id}" type="hidden"/>
+                    <input type="radio" th:field="*{typeEnum}" th:value="${T(org.ati.core.model.SystemConstants.TypeEnum).QUESTION}" th:text="Question"/>
+                    <input type="radio" th:field="*{typeEnum}" th:value="${T(org.ati.core.model.SystemConstants.TypeEnum).TASK}" th:text="Task"/>
                     <div class="login-field__submit">
                         <button class="submit__button button__register" type="submit">Create</button>
                     </div>
@@ -69,8 +71,8 @@
                     <p th:text="${task.assignedUser}"></p>
                 </div>
                 <div th:switch="${task.statusEnum}">
-                    <p th:case="${T(org.ati.core.model.StatusEnum).IN_PROGRESS}">IN PROGRESS</p>
-                    <p th:case="${T(org.ati.core.model.StatusEnum).DONE}">DONE</p>
+                    <p th:case="${T(org.ati.core.model.SystemConstants.StatusEnum).IN_PROGRESS}">IN PROGRESS</p>
+                    <p th:case="${T(org.ati.core.model.SystemConstants.StatusEnum).DONE}">DONE</p>
                 </div>
                 <div>Description:
                     <span th:text="${task.description}"></span>

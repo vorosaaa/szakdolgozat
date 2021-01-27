@@ -14,7 +14,7 @@ public class GroupService {
     @Autowired
     GroupRepository groupRepository;
 
-    public void deleteFlow(Group GROUP) {
+    public void deleteGroup(Group GROUP) {
         groupRepository.delete(GROUP);
     }
 

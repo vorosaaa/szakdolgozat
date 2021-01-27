@@ -24,7 +24,7 @@
 <div class="sidebar">
     <a th:href="@{/taskList}">My Tasks</a>
     <a href="#">Flows</a>
-    <a class="active" href="#">Group</a>
+    <a class="active" href="@{/groups}">Group</a>
     <a th:href="@{/myprofile}">My Profile</a>
 </div>
 
@@ -66,9 +66,16 @@
 
     <div class="flex-container tasks">
         <div class="tasks__task groups__group">
-            <a th:each="group : ${groups}" th:href="@{/groups/{id}(id=${group.id})}">
-                <div class="login-title task--title group__title" th:text="${group.name}"></div>
-            </a>
+            <div  th:each="group : ${groups}"class="margined">
+                <a th:href="@{/groups/{id}(id=${group.id})}">
+                    <div class="login-title task--title group__title" th:text="${group.name}"></div>
+                </a>
+                <div th:if="${user} == ${group.admin.username}" class="close">
+                    <form enctype="utf8" method="post" th:action="@{/deleteGroup/{id}(id=${group.id})}">
+                        <button type="submit"></button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>

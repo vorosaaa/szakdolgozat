@@ -67,6 +67,11 @@ public class UserDTO implements UserDetails {
     @Setter
     private Map<Task, UserDTO> votedFor;
 
+    @ElementCollection
+    @Getter
+    @Setter
+    private Map<Task, String> answered;
+
     @ManyToMany
     @JoinColumn(name = "group_id", nullable = true)
     @Getter
@@ -83,6 +88,7 @@ public class UserDTO implements UserDetails {
         this.stats = new HashMap<>();
         this.skillSet = new HashSet<>();
         this.votedFor = new HashMap<>();
+        this.answered = new HashMap<>();
     }
 
     @Override

@@ -26,6 +26,11 @@ public class Group {
     @Setter
     private Set<UserDTO> members;
 
+    @Getter
+    @Setter
+    @ManyToOne(targetEntity = UserDTO.class, fetch = FetchType.EAGER)
+    private UserDTO admin;
+
     @OneToMany
     @Getter
     @Setter
@@ -39,5 +44,6 @@ public class Group {
     public Group() {
         this.members = new HashSet<>();
         this.tasks = new HashSet<>();
+        this.admin = new UserDTO();
     }
 }
