@@ -1,6 +1,6 @@
 package org.ati.web.controller;
 
-import org.apache.catalina.User;
+import org.apache.tomcat.jni.Local;
 import org.ati.core.model.*;
 import org.ati.core.service.GroupService;
 import org.ati.core.service.TaskService;
@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -48,11 +51,21 @@ public class TaskController {
         answerList.sort(Comparator.naturalOrder());
         boolean voted = task.getAuthenticatedUserVoted().get(currentUser) != null && task.getAuthenticatedUserVoted().get(currentUser);
         boolean answered = currentUser.getAnswered().get(task) != null;
+        String concatenatedUserTaskId = currentUser.getId() + ":" + task.getId();
+        //TODO LocalDateTime.now() kiszamithatatlan
+        task.setVoteFinished(LocalDateTime.now().plusHours(1).atOffset(ZoneOffset.UTC).isAfter(task.getValidTo().atOffset(ZoneOffset.UTC)));
+        taskService.save(task);
+        boolean isAssignedUser = false;
+        if (task.getAssignedUser() != null) {
+            isAssignedUser = task.getAssignedUser() == currentUser;
+        }
 
+        model.addAttribute("isAssignedUser", isAssignedUser);
         model.addAttribute("task", task);
         model.addAttribute("members", userDTOList);
-        model.addAttribute("votedFor", currentUser.getVotedFor().get(task));
+        model.addAttribute("votedFor", currentUser.getVotedFor().get(concatenatedUserTaskId));
         model.addAttribute("voted", voted);
+        model.addAttribute("voteFinished", task.isVoteFinished());
         model.addAttribute("answered", answered);
         model.addAttribute("optionals", answerList);
         model.addAttribute("userAnswered", currentUser.getAnswered().get(task));
@@ -73,27 +86,29 @@ public class TaskController {
             vote(userDTO, task, finalAnswer);
         }
 
+        //TODO nem lehet még ugyanarra a userre szavazni hozzárendelés esetén, már egyszer jó volt
         if (request.getParameter("vote") != null) {
             UserDTO votedUser = userService.getOne(Long.parseLong(request.getParameter("vote")));
-            UserDTO previousVote = userDTO.getVotedFor().get(task);
+            String concatenatedUserTaskId = userDTO.getId() + ":" + task.getId();
+            UserDTO previousVote = userDTO.getVotedFor().get(concatenatedUserTaskId);
             if (previousVote == null) {
-                userDTO.getVotedFor().put(task, votedUser);
-                if (task.getVotes().containsKey(votedUser)) {
-                    int prevVote = task.getVotes().get(votedUser);
-                    task.getVotes().replace(votedUser, prevVote + 1);
+                userDTO.getVotedFor().put(concatenatedUserTaskId, votedUser);
+                if (task.getVotes().containsKey(votedUser.getId())) {
+                    int prevVote = task.getVotes().get(votedUser.getId());
+                    task.getVotes().replace(votedUser.getId(), prevVote + 1);
                 } else {
-                    task.getVotes().put(votedUser, 1);
+                    task.getVotes().put(votedUser.getId(), 1);
                 }
                 task.getAuthenticatedUserVoted().put(userDTO, true);
             } else {
                 if (votedUser != previousVote) {
-                    task.getVotes().replace(previousVote, task.getVotes().get(previousVote) - 1);
-                    userDTO.getVotedFor().replace(task, votedUser);
-                    if (task.getVotes().containsKey(votedUser)) {
-                        int prevVote = task.getVotes().get(votedUser);
-                        task.getVotes().replace(votedUser, prevVote + 1);
+                    task.getVotes().replace(previousVote.getId(), task.getVotes().get(previousVote.getId()) - 1);
+                    userDTO.getVotedFor().replace(concatenatedUserTaskId, votedUser);
+                    if (task.getVotes().containsKey(votedUser.getId())) {
+                        int prevVote = task.getVotes().get(votedUser.getId());
+                        task.getVotes().replace(votedUser.getId(), prevVote + 1);
                     } else {
-                        task.getVotes().put(votedUser, 1);
+                        task.getVotes().put(votedUser.getId(), 1);
                     }
                 }
             }
@@ -110,10 +125,28 @@ public class TaskController {
         return "redirect:/task/" + id;
     }
 
+    @PostMapping("/finish/{id}")
+    public String finishTask(@PathVariable Long id, Principal principal) {
+        Task task = taskService.getOne(id);
+        task.setStatusEnum(SystemConstants.StatusEnum.DONE);
+        taskService.save(task);
+        return "redirect:/task/" + id;
+    }
+
     @PostMapping("/saveTask")
     public String saveTask(@ModelAttribute("taskObj") Task task, HttpServletRequest request) {
         Group group = groupService.getOne(Long.parseLong(request.getParameter("groupVar")));
         task.setGroup(group);
+        if (request.getParameter("validTime") != null) {
+            String str = request.getParameter("validTime");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+            LocalDateTime dateTime = LocalDateTime.parse(str, formatter);
+            if (dateTime.atOffset(ZoneOffset.UTC).isAfter(LocalDateTime.now().atOffset(ZoneOffset.UTC))) {
+                task.setValidTo(dateTime);
+            } else {
+                task.setValidTo(LocalDateTime.now().plusDays(1));
+            }
+        }
         group.getTasks().add(task);
 
         taskService.save(task);
@@ -121,6 +154,12 @@ public class TaskController {
         return "redirect:/groups/" + group.getId();
     }
 
+    /**
+     * The user from param votes for answer
+     * @param userDTO user, who votes
+     * @param task task
+     * @param answer answered string
+     */
     private void vote(UserDTO userDTO, Task task, String answer) {
         String previousAnswer = userDTO.getAnswered().get(task);
         task.getOptionalAnswers().add(answer);

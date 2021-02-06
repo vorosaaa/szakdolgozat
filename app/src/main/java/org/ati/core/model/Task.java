@@ -61,7 +61,7 @@ public class Task {
     @ElementCollection
     @Getter
     @Setter
-    private Map<UserDTO, Integer> votes;
+    private Map<Long, Integer> votes;
 
     @ElementCollection
     @Getter

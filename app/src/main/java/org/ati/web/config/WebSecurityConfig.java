@@ -35,9 +35,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager customAuthenticationManager() throws Exception {
         return authenticationManager();
     }
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        //TODO Spring security megadja magát újraindítás után
         http
                 .authorizeRequests()
                 .antMatchers("/css/**", "/js/**", "/registration").permitAll()

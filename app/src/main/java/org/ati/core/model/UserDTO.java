@@ -65,7 +65,7 @@ public class UserDTO implements UserDetails {
     @ElementCollection
     @Getter
     @Setter
-    private Map<Task, UserDTO> votedFor;
+    private Map<String, UserDTO> votedFor;
 
     @ElementCollection
     @Getter

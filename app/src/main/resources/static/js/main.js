@@ -23,3 +23,8 @@
             modal.style.display = "none";
         }
     }
+
+    function MyDatetimeLocal() {
+        var x = document.getElementById("inputDate").min = new Date().toString();
+        console.log(x);
+    }
