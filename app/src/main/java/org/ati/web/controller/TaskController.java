@@ -1,7 +1,7 @@
 package org.ati.web.controller;
 
-import org.apache.tomcat.jni.Local;
 import org.ati.core.model.*;
+import org.ati.core.service.CommentService;
 import org.ati.core.service.GroupService;
 import org.ati.core.service.TaskService;
 import org.ati.core.service.UserService;
@@ -32,6 +32,8 @@ public class TaskController {
     private UserService userService;
     @Autowired
     private GroupService groupService;
+    @Autowired
+    private CommentService commentService;
 
     @GetMapping("/taskList")
     public String listTasks(Model model, Principal principal) {
@@ -65,7 +67,6 @@ public class TaskController {
         model.addAttribute("members", userDTOList);
         model.addAttribute("votedFor", currentUser.getVotedFor().get(concatenatedUserTaskId));
         model.addAttribute("voted", voted);
-        model.addAttribute("voteFinished", task.isVoteFinished());
         model.addAttribute("answered", answered);
         model.addAttribute("optionals", answerList);
         model.addAttribute("userAnswered", currentUser.getAnswered().get(task));
@@ -152,6 +153,27 @@ public class TaskController {
         taskService.save(task);
         groupService.save(group);
         return "redirect:/groups/" + group.getId();
+    }
+
+    @PostMapping("/comment/{id}")
+    public String comment(@PathVariable Long id, Principal principal, HttpServletRequest request) {
+        Task task = taskService.getOne(id);
+        UserDTO userDTO = userService.findByUsername(principal.getName());
+        String message = request.getParameter("comment");
+
+        if (message != null) {
+            Comment comment = new Comment();
+            comment.setCommentedBy(userDTO);
+            comment.setMessage(message);
+            comment.setDate(LocalDateTime.now());
+            commentService.save(comment);
+
+            task.getComments().add(comment);
+            taskService.save(task);
+        }
+
+        return "redirect:/task/" + id;
+
     }
 
     /**

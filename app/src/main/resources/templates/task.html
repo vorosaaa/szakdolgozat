@@ -48,9 +48,9 @@
                 <div class="left"><h3>Description:</h3>
                     <p th:text="${task.description}"></p>
                 </div>
-                <h4 th:if="${!voteFinished}" class="cleared">Choose an option or create one:</h4>
+                <h4 th:if="${!task.voteFinished}" class="cleared">Choose an option or create one:</h4>
 
-                <form th:if="${question} and ${!voteFinished}" class="form" enctype="utf8" method="POST" th:action="@{/vote/{id}(id=${task.id})}">
+                <form th:if="${question} and ${!task.voteFinished}" class="form" enctype="utf8" method="POST" th:action="@{/vote/{id}(id=${task.id})}">
                     <div class="inputGroup" th:each="answer : ${optionals}">
                         <input th:id="${answer}" th:if="${!answered}" th:name="answer" th:value="${answer}"
                                type="radio">
@@ -63,7 +63,7 @@
                         <button class="submit__button button__register button__task__submit" type="submit">Vote</button>
                     </div>
                 </form>
-                <form th:if="${!question} and ${!voteFinished}" class="form" enctype="utf8" method="POST" th:action="@{/vote/{id}(id=${task.id})}">
+                <form th:if="${!question} and ${!task.voteFinished}" class="form" enctype="utf8" method="POST" th:action="@{/vote/{id}(id=${task.id})}">
                     <div class="inputGroup" th:each="answer : ${optionals}">
                         <input th:id="${answer}" th:if="${!answered}" th:name="answer" th:value="${answer}"
                                type="radio">
@@ -83,11 +83,43 @@
                         <button class="submit__button button__register button__task__submit" type="submit">Vote</button>
                     </div>
                 </form>
-                <form th:if="${voteFinished} and ${isAssignedUser} and ${!question}" class="form" enctype="utf8" method="POST" th:action="@{/finish/{id}(id=${task.id})}">
+                <form th:if="${task.voteFinished} and ${isAssignedUser} and ${!question}" class="form" enctype="utf8" method="POST" th:action="@{/finish/{id}(id=${task.id})}">
                     <div class="submit__button__holder">
                         <button class="submit__button button__register button__task__submit" type="submit">Finish</button>
                     </div>
                 </form>
+                <div th:if="${task.voteFinished}" class="container">
+                    <div class="be-comment-block">
+                        <div th:each="comment : ${task.comments}" class="be-comment">
+<!--                            <div class="be-img-comment">-->
+<!--                                <a href="blog-detail-2.html">-->
+<!--                                    <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="" class="be-ava-comment">-->
+<!--                                </a>-->
+<!--                            </div>-->
+                            <div class="be-comment-content">
+                                <span class="be-comment-name">
+                                    <div th:text="${comment.commentedBy.username}" ></div>
+                                </span>
+                                <span class="be-comment-time">
+                                    <i class="fa fa-clock-o"></i>
+                                    <span th:text="${comment.date}"></span>
+                                </span>
+                                <p class="be-comment-text" th:text="${comment.message}"></p>
+                            </div>
+                        </div>
+
+                        <form class="form-block" enctype="utf8" method="POST" th:action="@{/comment/{id}(id=${task.id})}">
+                            <div class="row">
+                                <div class="col-xl-8">
+                                    <div class="form-group form-group-spec">
+                                        <textarea class="form-input" required="" th:name="comment" placeholder="Your text"></textarea>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary pull-right">submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

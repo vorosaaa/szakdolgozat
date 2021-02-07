@@ -42,6 +42,11 @@ public class Task {
 
     @Getter
     @Setter
+    @ManyToMany
+    private Set<Comment> comments;
+
+    @Getter
+    @Setter
     @ManyToOne
     private Group group;
 
@@ -82,6 +87,7 @@ public class Task {
     private SystemConstants.StatusEnum statusEnum;
 
     public Task() {
+        this.comments = new HashSet<>();
         this.requiredSkills = new HashSet<>();
         this.optionalAnswers = new HashSet<>();
         this.votes = new HashMap<>();
