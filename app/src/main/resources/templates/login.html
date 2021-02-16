@@ -21,7 +21,7 @@
         <div class="login-title">
             Please login
         </div>
-        <form action="#" method="POST" th:action="@{/login}">
+        <form action="#" method="post" th:action="@{/login}">
             <div class="login-field">
                 <input autofocus="true" class="input-upper" name="username" placeholder="userDTO@example.com"
                        type="text"/>
@@ -29,7 +29,6 @@
                 <input name="password" placeholder="Password" type="password"/>
                 <span class="has-error" th:text="${error}"></span>
 
-                <input name="${_csrf.parameterName}" type="hidden" value="${_csrf.token}"/>
 
                 <div class="login-field__submit">
                     <button class="submit__button" name="login" type="submit">Login</button>

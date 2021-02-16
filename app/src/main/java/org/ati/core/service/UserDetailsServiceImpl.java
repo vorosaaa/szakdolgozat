@@ -1,6 +1,7 @@
 package org.ati.core.service;
 
 import org.ati.core.model.UserDTO;
+import org.ati.core.model.UserRole;
 import org.ati.core.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,6 +20,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private UserRepository userRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) {
         UserDTO user = userRepository.findByUsername(username);
         if (user == null) throw new UsernameNotFoundException(username);

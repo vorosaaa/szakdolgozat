@@ -43,25 +43,7 @@ public class UserService {
         return userRepository.getOne(id);
     }
 
-
     public UserDTO findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
-
-
-    public void signUpUser(UserDTO user) {
-        String encryptedPassword = bCryptPasswordEncoder.encode(user.getPassword());
-        user.setPassword(encryptedPassword);
-        userRepository.save(user);
-        ConfirmationToken confirmationToken = new ConfirmationToken(user);
-        confirmationTokenService.saveConfirmationToken(confirmationToken);
-    }
-
-    public void confirmUser(ConfirmationToken confirmationToken) {
-        UserDTO user = confirmationToken.getUser();
-        user.setEnabled(true);
-        userRepository.save(user);
-        confirmationTokenService.deleteConfirmationToken(confirmationToken.getId());
-    }
-
 }

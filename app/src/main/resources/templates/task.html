@@ -90,6 +90,20 @@
                 </form>
                 <div th:if="${task.voteFinished}" class="container">
                     <div class="be-comment-block">
+                        <form class="form" th:if="${!question}" enctype="utf8" >
+                            <div class="inputGroup" th:each="member : ${members}">
+                                <input th:checked="${winnerVote} == ${member.name}"
+                                       th:name="member" disabled type="radio">
+                                <label th:for="${member.name}"><p th:text="${member.name}"></p></label>
+                            </div>
+                        </form>
+                        <form class="form" enctype="utf8" >
+                            <div class="inputGroup" th:each="answer : ${optionals}">
+                                <input th:checked="${winnerVote} == ${answer}"
+                                       th:name="answer" disabled type="radio">
+                                <label th:for="${answer}"><p th:text="${answer}"></p></label>
+                            </div>
+                        </form>
                         <div th:each="comment : ${task.comments}" class="be-comment">
 <!--                            <div class="be-img-comment">-->
 <!--                                <a href="blog-detail-2.html">-->

@@ -18,10 +18,7 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 public class TaskController {
@@ -56,11 +53,23 @@ public class TaskController {
         String concatenatedUserTaskId = currentUser.getId() + ":" + task.getId();
         //TODO LocalDateTime.now() kiszamithatatlan
         task.setVoteFinished(LocalDateTime.now().plusHours(1).atOffset(ZoneOffset.UTC).isAfter(task.getValidTo().atOffset(ZoneOffset.UTC)));
+        String winnerVote = "";
+
+        if (task.isVoteFinished()) {
+            String[] array = getMaxEntryInMapBasedOnValue(task.getAnswers()).split("\\:");
+            winnerVote = array[1];
+            if (task.getTypeEnum().equals(SystemConstants.TypeEnum.TASK)) {
+                String[] assigned = getMaxEntryInMapBasedOnValue(task.getVotes()).split("\\:");
+                String userId = assigned[0];
+                task.setAssignedUser(userService.getOne(Long.parseLong(userId)));
+            }
+        }
         taskService.save(task);
         boolean isAssignedUser = false;
         if (task.getAssignedUser() != null) {
             isAssignedUser = task.getAssignedUser() == currentUser;
         }
+
 
         model.addAttribute("isAssignedUser", isAssignedUser);
         model.addAttribute("task", task);
@@ -71,6 +80,7 @@ public class TaskController {
         model.addAttribute("optionals", answerList);
         model.addAttribute("userAnswered", currentUser.getAnswered().get(task));
         model.addAttribute("question", task.getTypeEnum() == SystemConstants.TypeEnum.QUESTION);
+        model.addAttribute("winnerVote", winnerVote);
 
         return "task";
     }
@@ -90,26 +100,32 @@ public class TaskController {
         //TODO nem lehet még ugyanarra a userre szavazni hozzárendelés esetén, már egyszer jó volt
         if (request.getParameter("vote") != null) {
             UserDTO votedUser = userService.getOne(Long.parseLong(request.getParameter("vote")));
+
+            String concatenatedVotedUserTaskId = votedUser.getId() + ":" + task.getId();
             String concatenatedUserTaskId = userDTO.getId() + ":" + task.getId();
+
             UserDTO previousVote = userDTO.getVotedFor().get(concatenatedUserTaskId);
+            String concatenatedPreviousVoteTaskId;
+
             if (previousVote == null) {
                 userDTO.getVotedFor().put(concatenatedUserTaskId, votedUser);
-                if (task.getVotes().containsKey(votedUser.getId())) {
-                    int prevVote = task.getVotes().get(votedUser.getId());
-                    task.getVotes().replace(votedUser.getId(), prevVote + 1);
+                if (task.getVotes().containsKey(concatenatedVotedUserTaskId)) {
+                    int prevVote = task.getVotes().get(concatenatedVotedUserTaskId);
+                    task.getVotes().replace(concatenatedVotedUserTaskId, prevVote + 1);
                 } else {
-                    task.getVotes().put(votedUser.getId(), 1);
+                    task.getVotes().put(concatenatedVotedUserTaskId, 1);
                 }
                 task.getAuthenticatedUserVoted().put(userDTO, true);
             } else {
                 if (votedUser != previousVote) {
-                    task.getVotes().replace(previousVote.getId(), task.getVotes().get(previousVote.getId()) - 1);
+                    concatenatedPreviousVoteTaskId = previousVote.getId() + ":" + task.getId();
+                    task.getVotes().replace(concatenatedPreviousVoteTaskId, task.getVotes().get(concatenatedPreviousVoteTaskId) - 1);
                     userDTO.getVotedFor().replace(concatenatedUserTaskId, votedUser);
-                    if (task.getVotes().containsKey(votedUser.getId())) {
-                        int prevVote = task.getVotes().get(votedUser.getId());
-                        task.getVotes().replace(votedUser.getId(), prevVote + 1);
+                    if (task.getVotes().containsKey(concatenatedVotedUserTaskId)) {
+                        int prevVote = task.getVotes().get(concatenatedPreviousVoteTaskId);
+                        task.getVotes().replace(concatenatedVotedUserTaskId, prevVote + 1);
                     } else {
-                        task.getVotes().put(votedUser.getId(), 1);
+                        task.getVotes().put(concatenatedVotedUserTaskId, 1);
                     }
                 }
             }
@@ -186,24 +202,40 @@ public class TaskController {
         String previousAnswer = userDTO.getAnswered().get(task);
         task.getOptionalAnswers().add(answer);
 
+        String concatenatedAnswerTask = task.getId() + ":" + answer;
+
         if (previousAnswer == null) {
-            userDTO.getAnswered().put(task, answer);
-            if (task.getAnswers().containsKey(answer)) {
-                int prevAnswerSum = task.getAnswers().get(answer);
-                task.getAnswers().replace(answer, prevAnswerSum + 1);
+            userDTO.getAnswered().put(task, concatenatedAnswerTask);
+            if (task.getAnswers().containsKey(concatenatedAnswerTask)) {
+                int prevAnswerSum = task.getAnswers().get(concatenatedAnswerTask);
+                task.getAnswers().replace(concatenatedAnswerTask, prevAnswerSum + 1);
             } else {
-                task.getAnswers().put(answer, 1);
+                task.getAnswers().put(concatenatedAnswerTask, 1);
             }
         } else {
-            if (!answer.equals(previousAnswer)) {
+            if (!concatenatedAnswerTask.equals(previousAnswer)) {
                 task.getAnswers().replace(previousAnswer, task.getAnswers().get(previousAnswer) - 1);
-                userDTO.getAnswered().replace(task, answer);
-                if (task.getAnswers().containsKey(answer)) {
-                    task.getAnswers().replace(answer, task.getAnswers().get(answer) + 1);
+                userDTO.getAnswered().replace(task, concatenatedAnswerTask);
+                if (task.getAnswers().containsKey(concatenatedAnswerTask)) {
+                    task.getAnswers().replace(concatenatedAnswerTask, task.getAnswers().get(answer) + 1);
                 } else {
-                    task.getAnswers().put(answer, 1);
+                    task.getAnswers().put(concatenatedAnswerTask, 1);
                 }
             }
         }
+    }
+
+    public static <K, V extends Comparable<V> > K getMaxEntryInMapBasedOnValue(Map<K, V> map) {
+        // To store the result
+        Map.Entry<K, V> entryWithMaxValue = null;
+
+        // Iterate in the map to find the required entry
+        for (Map.Entry<K, V> currentEntry : map.entrySet()) {
+            if (entryWithMaxValue == null || currentEntry.getValue().compareTo(entryWithMaxValue.getValue()) > 0) {
+                entryWithMaxValue = currentEntry;
+            }
+        }
+        // Return the entry with highest value
+        return entryWithMaxValue.getKey();
     }
 }

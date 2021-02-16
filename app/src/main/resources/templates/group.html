@@ -86,9 +86,9 @@
                 <div>Description:
                     <span th:text="${task.description}"></span>
                 </div>
-                <a th:href="@{/task/{id}(id=${task.id})}">
+                <form th:action="@{/task/{id}(id=${task.id})}" method="GET">
                     <button class="submit__button button__register" type="submit">Redirect</button>
-                </a>
+                </form>
             </div>
         </div>
     </div>

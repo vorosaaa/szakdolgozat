@@ -17,7 +17,8 @@ import java.util.*;
 public class UserDTO implements UserDetails {
 
     @Builder.Default
-    private final UserRole userRole = UserRole.USER;
+    @ElementCollection
+    private Set<UserRole> userRole;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true)
@@ -85,6 +86,8 @@ public class UserDTO implements UserDetails {
     private Boolean enabled = false;
 
     public UserDTO() {
+        this.userRole = new HashSet<>();
+        userRole.add(UserRole.USER);
         this.stats = new HashMap<>();
         this.skillSet = new HashSet<>();
         this.votedFor = new HashMap<>();
@@ -93,9 +96,11 @@ public class UserDTO implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(userRole.name());
-        return Collections.singletonList(simpleGrantedAuthority);
-
+        List<SimpleGrantedAuthority> grantedAuthorities = new ArrayList<>();
+        for (UserRole userRoleElement : userRole) {
+            grantedAuthorities.add(new SimpleGrantedAuthority(userRoleElement.name()));
+        }
+        return grantedAuthorities;
     }
 
     @Override
