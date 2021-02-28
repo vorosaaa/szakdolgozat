@@ -39,7 +39,7 @@
         <div class="tasks__task task__edit">
             <div class="login-field task--field task__edit">
                 <div th:if="${task.voteFinished}">Assigned user:
-                    <p th:text="${task.assignedUser}"></p>
+                    <p th:text="${task.assignedUser.name}"></p>
                 </div>
                 <div th:switch="${task.statusEnum}">
                     <h3 th:case="${T(org.ati.core.model.SystemConstants.StatusEnum).IN_PROGRESS}">IN PROGRESS</h3>
@@ -83,7 +83,8 @@
                         <button class="submit__button button__register button__task__submit" type="submit">Vote</button>
                     </div>
                 </form>
-                <form th:if="${task.voteFinished} and ${isAssignedUser} and ${!question}" class="form" enctype="utf8" method="POST" th:action="@{/finish/{id}(id=${task.id})}">
+                <form th:if="${task.voteFinished} and ${isAssignedUser} and ${!question} and ${task.statusEnum} == ${T(org.ati.core.model.SystemConstants.StatusEnum).IN_PROGRESS}"
+                      class="form" enctype="utf8" method="POST" th:action="@{/finish/{id}(id=${task.id})}">
                     <div class="submit__button__holder">
                         <button class="submit__button button__register button__task__submit" type="submit">Finish</button>
                     </div>

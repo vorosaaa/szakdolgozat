@@ -1,5 +1,6 @@
 package org.ati.web.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.ati.core.model.*;
 import org.ati.core.service.CommentService;
 import org.ati.core.service.GroupService;
@@ -21,6 +22,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Controller
+@Slf4j
 public class TaskController {
 
     @Autowired
@@ -55,13 +57,13 @@ public class TaskController {
         task.setVoteFinished(LocalDateTime.now().plusHours(1).atOffset(ZoneOffset.UTC).isAfter(task.getValidTo().atOffset(ZoneOffset.UTC)));
         String winnerVote = "";
 
-        if (task.isVoteFinished()) {
+        if (task.isVoteFinished() && task.getAnswers().size() != 0 && task.getVotes().size() != 0) {
             String[] array = getMaxEntryInMapBasedOnValue(task.getAnswers()).split("\\:");
             winnerVote = array[1];
             if (task.getTypeEnum().equals(SystemConstants.TypeEnum.TASK)) {
-                String[] assigned = getMaxEntryInMapBasedOnValue(task.getVotes()).split("\\:");
-                String userId = assigned[0];
-                task.setAssignedUser(userService.getOne(Long.parseLong(userId)));
+//                VoteForUser assigned = (VoteForUser) getMaxEntryInMapBasedOnValue(task.getVotes());
+//                String userId = assigned[0];
+//                task.setAssignedUser(userService.getOne(Long.parseLong(userId)));
             }
         }
         taskService.save(task);
@@ -92,7 +94,7 @@ public class TaskController {
         String newAnswer = request.getParameter("newAnswer");
         String answer = request.getParameter("answer");
 
-        if (newAnswer != null || answer  != null) {
+        if (newAnswer != null || answer != null) {
             String finalAnswer = (newAnswer != null && !newAnswer.isEmpty()) ? newAnswer : answer;
             vote(userDTO, task, finalAnswer);
         }
@@ -101,44 +103,41 @@ public class TaskController {
         if (request.getParameter("vote") != null) {
             UserDTO votedUser = userService.getOne(Long.parseLong(request.getParameter("vote")));
 
-            String concatenatedVotedUserTaskId = votedUser.getId() + ":" + task.getId();
             String concatenatedUserTaskId = userDTO.getId() + ":" + task.getId();
-
             UserDTO previousVote = userDTO.getVotedFor().get(concatenatedUserTaskId);
-            String concatenatedPreviousVoteTaskId;
 
             if (previousVote == null) {
                 userDTO.getVotedFor().put(concatenatedUserTaskId, votedUser);
-                if (task.getVotes().containsKey(concatenatedVotedUserTaskId)) {
-                    int prevVote = task.getVotes().get(concatenatedVotedUserTaskId);
-                    task.getVotes().replace(concatenatedVotedUserTaskId, prevVote + 1);
-                } else {
-                    task.getVotes().put(concatenatedVotedUserTaskId, 1);
+                VoteForUser voteForUser = getVote(votedUser, task);
+                try {
+                    taskService.save(voteForUser);
+                } catch (Exception e) {
+                    log.error(e.getMessage());
                 }
-                task.getAuthenticatedUserVoted().put(userDTO, true);
+//                task.getAuthenticatedUserVoted().put(userDTO, true);
+                log.info("nem volt previous: voteForUser id:" + voteForUser.getId() + ", userid: " + voteForUser.getUserId());
             } else {
                 if (votedUser != previousVote) {
-                    concatenatedPreviousVoteTaskId = previousVote.getId() + ":" + task.getId();
-                    task.getVotes().replace(concatenatedPreviousVoteTaskId, task.getVotes().get(concatenatedPreviousVoteTaskId) - 1);
-                    userDTO.getVotedFor().replace(concatenatedUserTaskId, votedUser);
-                    if (task.getVotes().containsKey(concatenatedVotedUserTaskId)) {
-                        int prevVote = task.getVotes().get(concatenatedPreviousVoteTaskId);
-                        task.getVotes().replace(concatenatedVotedUserTaskId, prevVote + 1);
-                    } else {
-                        task.getVotes().put(concatenatedVotedUserTaskId, 1);
+                    VoteForUser prevVote = taskService.getVoteByTaskAndUser(task.getId().toString(), previousVote.getId().toString());
+                    prevVote.setNumberOfVotes(prevVote.getNumberOfVotes() - 1);
+                    userDTO.getVotedFor().put(concatenatedUserTaskId, votedUser);
+                    VoteForUser voteForUser = getVote(votedUser, task);
+                    try {
+                        taskService.save(voteForUser);
+                        taskService.save(prevVote);
+                    } catch (Exception e) {
+                        log.error(e.getMessage());
                     }
+                    log.info("volt previous: voteForUser id:" + voteForUser.getId());
                 }
             }
         }
-        int sum = 0;
-        for (Map.Entry<String, Integer> entry : task.getAnswers().entrySet()) {
-            sum += entry.getValue();
+        try {
+            userService.save(userDTO);
+            taskService.save(task);
+        } catch (Exception e) {
+            log.info(e.getMessage());
         }
-//        task.setEverybodyAnswered(sum == task.getGroup().getMembers().size());
-//        task.setVoteFinished(task.getVotes().size() == task.getGroup().getMembers().size());
-        taskService.save(task);
-        userService.save(userDTO);
-
         return "redirect:/task/" + id;
     }
 
@@ -190,6 +189,25 @@ public class TaskController {
 
         return "redirect:/task/" + id;
 
+    }
+
+    private VoteForUser getVote(UserDTO votedUser, Task task) {
+        VoteForUser voteForUser = null;
+        for (VoteForUser iterated : task.getVotes()) {
+            if (Long.parseLong(iterated.getUserId()) == votedUser.getId()) {
+                voteForUser = iterated;
+            }
+        }
+        if (voteForUser == null) {
+            voteForUser = new VoteForUser();
+            voteForUser.setUserId(votedUser.getId().toString());
+            voteForUser.setTaskId(task.getId().toString());
+            voteForUser.setNumberOfVotes(1);
+            task.getVotes().add(voteForUser);
+        } else {
+            voteForUser.setNumberOfVotes(voteForUser.getNumberOfVotes() + 1);
+        }
+        return voteForUser;
     }
 
     /**

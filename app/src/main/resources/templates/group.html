@@ -61,10 +61,10 @@
                             <input type="radio" th:id="task" th:field="*{typeEnum}" th:value="${T(org.ati.core.model.SystemConstants.TypeEnum).TASK}" />
                             <label th:for="task"><p th:text="Task"></p></label>
                         </div>
-                        <input type="datetime-local" name="validTime" id="inputDate" required/>
-                        <div class="login-field__submit">
-                            <button class="submit__button button__register" type="submit">Create</button>
-                        </div>
+                    </div>
+                    <input type="datetime-local" name="validTime" id="inputDate" required/>
+                    <div class="login-field__submit">
+                        <button class="submit__button button__register" type="submit">Create</button>
                     </div>
                 </form>
             </div>
@@ -77,14 +77,14 @@
             <div class="login-title task--title" th:text="${task.name}"></div>
             <div class="login-field task--field">
                 <div th:if="${task.voteFinished}">Assigned user:
-                    <p th:text="${task.assignedUser}"></p>
+                    <p th:text="${task.assignedUser.name}"></p>
                 </div>
                 <div th:switch="${task.statusEnum}">
                     <p th:case="${T(org.ati.core.model.SystemConstants.StatusEnum).IN_PROGRESS}">IN PROGRESS</p>
                     <p th:case="${T(org.ati.core.model.SystemConstants.StatusEnum).DONE}">DONE</p>
                 </div>
-                <div>Description:
-                    <span th:text="${task.description}"></span>
+                <div class="task--field--desc">Description:
+                    <span class="line--break" th:text="${task.description}"></span>
                 </div>
                 <form th:action="@{/task/{id}(id=${task.id})}" method="GET">
                     <button class="submit__button button__register" type="submit">Redirect</button>

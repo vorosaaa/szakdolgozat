@@ -176,13 +176,14 @@ div.margined {
     justify-content: flex-start;
     align-items: flex-start;
     flex-direction: column;
+    height: auto;
 }
 .task__edit {
     height: auto !important;
 }
 .tasks__task {
     width: 60%;
-    height: 16%;
+    height: auto;
     border-style: solid;
     border-color: #4CAF50;
     border-width: revert;
@@ -207,6 +208,14 @@ div.margined {
     overflow: hidden;
     height: auto;
     /*Scrollable*/
+}
+
+.task--field--desc {
+    text-align: left;
+}
+
+.line--break {
+    line-break: anywhere;
 }
 
 .sidebar a.active {
@@ -245,7 +254,7 @@ div.content {
   overflow: hidden;
 }
 .inputGroup label:before {
-  width: 10px;
+  width: 100%;
   height: 10px;
   border-radius: 50%;
   content: "";

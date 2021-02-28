@@ -66,12 +66,12 @@ public class Task {
     @ElementCollection
     @Getter
     @Setter
-    private Map<String, Integer> votes;
+    private Map<String, Integer> answers;
 
     @ElementCollection
     @Getter
     @Setter
-    private Map<String, Integer> answers;
+    private Set<VoteForUser> votes;
 
     @ElementCollection
     @Getter
@@ -90,7 +90,7 @@ public class Task {
         this.comments = new HashSet<>();
         this.requiredSkills = new HashSet<>();
         this.optionalAnswers = new HashSet<>();
-        this.votes = new HashMap<>();
+        this.votes = new HashSet<>();
         this.answers = new HashMap<>();
         this.authenticatedUserVoted = new HashMap<>();
         this.voteFinished = false;

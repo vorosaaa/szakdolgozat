@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 
 <head>
     <meta charset="utf-8">
@@ -21,14 +22,13 @@
         <div class="login-title">
             Please login
         </div>
-        <form action="#" method="post" th:action="@{/login}">
+        <form method="post" th:action="@{/login}">
             <div class="login-field">
                 <input autofocus="true" class="input-upper" name="username" placeholder="userDTO@example.com"
                        type="text"/>
 
                 <input name="password" placeholder="Password" type="password"/>
                 <span class="has-error" th:text="${error}"></span>
-
 
                 <div class="login-field__submit">
                     <button class="submit__button" name="login" type="submit">Login</button>

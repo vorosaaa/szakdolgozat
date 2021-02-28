@@ -1,5 +1,6 @@
 package org.ati.web.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.ati.core.model.UserDTO;
 import org.ati.core.service.ConfirmationTokenService;
 import org.ati.core.service.SecurityService;
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 
 @Controller
+@Slf4j
 public class UserController {
     @Autowired
     private UserService userService;
@@ -62,6 +64,7 @@ public class UserController {
         }
         if (error != null) {
             model.addAttribute("error", "Your username and password is invalid.");
+            log.error(error);
         }
         if (logout != null) {
             model.addAttribute("message", "You have been logged out successfully.");
