@@ -21,7 +21,6 @@
 
 <div class="sidebar">
     <a th:href="@{/taskList}">My Tasks</a>
-    <a href="#">Flows</a>
     <a th:href="@{/groups}">Group</a>
     <a class="active" href="#">My Profile</a>
 </div>
@@ -34,26 +33,35 @@
         </a>
     </div>
 
-    <!--########## Ne feledd, ez az egész egy form lesz submit gombbal ;) validálni se feledj majd #########-->
-    <form th:action="@{/registration}">
+    <form method="POST" th:action="@{/update}" th:object="${user}">
         <table>
             <tbody>
             <tr>
-                <td>Name:</td>
-                <td th:text="${user.name}"></td>
+                <td>Name: <p th:text="${user.name}"></p></td>
+            </tr>
+            <tr>
+                <td>Username:</td>
+                <td>
+                    <input type="text" th:field="*{username}">
+                    <span class="has-error" th:errors="*{username}" th:if="${#fields.hasErrors('username')}"></span>
+                </td>
             </tr>
             <tr>
                 <td>Password</td>
             </tr>
             <tr>
                 <td>
-                    <input placeholder="Previous password" type="password">
+                    <input placeholder="Previous password" th:field="*{password}" type="password"><br>
+                    <span class="has-error" th:errors="*{password}"
+                          th:if="${#fields.hasErrors('password')}"></span>
                 </td>
                 <td>
-                    <input placeholder="New password" type="password">
+                    <input placeholder="New password" th:field="*{newPassword}" type="password">
                 </td>
                 <td>
-                    <input placeholder="New password again" type="password">
+                    <input placeholder="New password again" th:field="*{matchingPassword}" type="password">
+                    <span class="has-error" th:errors="*{matchingPassword}"
+                          th:if="${#fields.hasErrors('matchingPassword')}"></span>
                 </td>
             </tr>
             <tr>

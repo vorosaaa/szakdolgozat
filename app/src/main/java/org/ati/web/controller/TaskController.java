@@ -114,7 +114,7 @@ public class TaskController {
                 } catch (Exception e) {
                     log.error(e.getMessage());
                 }
-//                task.getAuthenticatedUserVoted().put(userDTO, true);
+                task.getAuthenticatedUserVoted().put(userDTO, true);
                 log.info("nem volt previous: voteForUser id:" + voteForUser.getId() + ", userid: " + voteForUser.getUserId());
             } else {
                 if (votedUser != previousVote) {

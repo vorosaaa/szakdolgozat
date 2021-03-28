@@ -43,6 +43,12 @@ public class UserDTO implements UserDetails {
 
     @NotNull
     @NotEmpty
+    @Setter
+    @Getter
+    private String newPassword;
+
+    @NotNull
+    @NotEmpty
     @Getter
     @Setter
     private String email;

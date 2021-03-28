@@ -21,7 +21,6 @@
 
 <div class="sidebar">
     <a class="active" href="#">My Tasks</a>
-    <a href="#">Flows</a>
     <a th:href="@{/groups}">Group</a>
     <a th:href="@{/myprofile}">My Profile</a>
 </div>
@@ -35,13 +34,6 @@
     </div>
 
     <div class="flex-container tasks">
-        <div class="tasks__task">
-            <div class="login-title task--title">halimaliho</div>
-            <div class="login-field task--field">
-                <div>ebbol vajon</div>
-                <div>mi lesz??</div>
-            </div>
-        </div>
         <a th:each="task : ${taskList}" th:href="@{/task/{id}(id=${task.id})}">
             <div class="tasks__task">
                 <div class="login-title task--title" th:text="${task.name}"></div>

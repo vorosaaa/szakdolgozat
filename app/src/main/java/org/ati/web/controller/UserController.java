@@ -7,6 +7,7 @@ import org.ati.core.service.SecurityService;
 import org.ati.core.service.UserService;
 import org.ati.core.validators.UserValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -20,6 +21,9 @@ import java.security.Principal;
 @Controller
 @Slf4j
 public class UserController {
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
     @Autowired
     private UserService userService;
 
@@ -41,6 +45,42 @@ public class UserController {
 
         model.addAttribute("userForm", new UserDTO());
         return "registration";
+    }
+
+    @PostMapping("/update")
+    public String update(@ModelAttribute("user") UserDTO userForm, Principal principal, BindingResult errors) {
+        UserDTO user = userService.findByUsername(principal.getName());
+        String username = userForm.getUsername();
+        String oldPw = userForm.getPassword();
+        String pw = userForm.getNewPassword();
+        String matching = userForm.getMatchingPassword();
+
+        if (!username.equals(user.getUsername())) {
+            if (userService.findByUsername(username) != null) {
+                errors.rejectValue("username", "Duplicate.userForm.username");
+            } else if (username.length() < 6 || username.length() > 32) {
+                errors.rejectValue("username", "Size.userForm.username");
+            } else {
+                user.setUsername(username);
+            }
+        }
+
+        if (pw != null) {
+            if (oldPw == null || !bCryptPasswordEncoder.matches(oldPw, user.getPassword())) {
+                errors.rejectValue("password", "Must.enter.prev.pw");
+            } else if (!pw.equals(matching)) {
+                errors.rejectValue("matchingPassword", "Diff.userForm.passwordConfirm");
+            } else {
+                user.setPassword(bCryptPasswordEncoder.encode(pw));
+            }
+        }
+        if (errors.hasErrors()) {
+            return "myprofile";
+        }
+
+        userService.save(user);
+
+        return "redirect:/welcome";
     }
 
     @PostMapping("/registration")
