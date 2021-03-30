@@ -7,6 +7,7 @@ import org.ati.core.service.SecurityService;
 import org.ati.core.service.UserService;
 import org.ati.core.validators.UserValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -71,14 +72,14 @@ public class UserController {
             } else if (!pw.equals(matching)) {
                 errors.rejectValue("matchingPassword", "Diff.userForm.passwordConfirm");
             } else {
-                user.setPassword(bCryptPasswordEncoder.encode(pw));
+                user.setPassword(pw);
             }
         }
         if (errors.hasErrors()) {
             return "myprofile";
         }
-
         userService.save(user);
+        SecurityContextHolder.getContext().setAuthentication(null);
 
         return "redirect:/welcome";
     }
