@@ -37,7 +37,10 @@
         <table>
             <tbody>
             <tr>
-                <td>Name: <p th:text="${user.name}"></p></td>
+                <td>Name: </td>
+                <td>
+                    <input type="text" th:field="*{name}">
+                </td>
             </tr>
             <tr>
                 <td>Username:</td>

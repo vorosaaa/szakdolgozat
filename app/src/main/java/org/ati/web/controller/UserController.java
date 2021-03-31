@@ -1,6 +1,7 @@
 package org.ati.web.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.ati.core.model.UserDTO;
 import org.ati.core.service.ConfirmationTokenService;
 import org.ati.core.service.SecurityService;
@@ -56,6 +57,7 @@ public class UserController {
         String pw = userForm.getNewPassword();
         String matching = userForm.getMatchingPassword();
 
+        user.setName(userForm.getName());
         if (!username.equals(user.getUsername())) {
             if (userService.findByUsername(username) != null) {
                 errors.rejectValue("username", "Duplicate.userForm.username");
@@ -65,8 +67,7 @@ public class UserController {
                 user.setUsername(username);
             }
         }
-
-        if (pw != null) {
+        if (!StringUtils.isEmpty(pw)) {
             if (oldPw == null || !bCryptPasswordEncoder.matches(oldPw, user.getPassword())) {
                 errors.rejectValue("password", "Must.enter.prev.pw");
             } else if (!pw.equals(matching)) {
