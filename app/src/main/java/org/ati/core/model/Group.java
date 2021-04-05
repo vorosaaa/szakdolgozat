@@ -36,11 +36,6 @@ public class Group {
     @Setter
     private Set<Task> tasks;
 
-    @OneToOne(targetEntity = Flow.class, fetch = FetchType.EAGER)
-    @Getter
-    @Setter
-    private Flow assignedFlow;
-
     public Group() {
         this.members = new HashSet<>();
         this.tasks = new HashSet<>();

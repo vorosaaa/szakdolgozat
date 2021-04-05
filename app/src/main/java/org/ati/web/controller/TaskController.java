@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.thymeleaf.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
@@ -50,45 +51,57 @@ public class TaskController {
         userDTOList.sort(Comparator.comparing(UserDTO::getName));
         List<String> answerList = new ArrayList<>(task.getOptionalAnswers());
         answerList.sort(Comparator.naturalOrder());
-        boolean voted = task.getAuthenticatedUserVoted().get(currentUser) != null && task.getAuthenticatedUserVoted().get(currentUser);
-        boolean answered = currentUser.getAnswered().get(task) != null;
+        boolean answered = !StringUtils.isEmpty(currentUser.getAnswered().get(task));
         String concatenatedUserTaskId = currentUser.getId() + ":" + task.getId();
-        //TODO LocalDateTime.now() kiszamithatatlan
-        task.setVoteFinished(LocalDateTime.now().plusHours(1).atOffset(ZoneOffset.UTC).isAfter(task.getValidTo().atOffset(ZoneOffset.UTC)));
+        task.setVoteFinished(LocalDateTime.now().atOffset(ZoneOffset.UTC).isAfter(task.getValidTo().atOffset(ZoneOffset.UTC)));
         String winnerVote = "";
+        String winnerAnswer = "";
 
-        if (task.isVoteFinished() && task.getAnswers().size() != 0 && task.getVotes().size() != 0) {
-            String[] array = getMaxEntryInMapBasedOnValue(task.getAnswers()).split("\\:");
-            winnerVote = array[1];
-            if (task.getTypeEnum().equals(SystemConstants.TypeEnum.TASK)) {
-//                VoteForUser assigned = (VoteForUser) getMaxEntryInMapBasedOnValue(task.getVotes());
-//                String userId = assigned[0];
-//                task.setAssignedUser(userService.getOne(Long.parseLong(userId)));
-            }
-        }
+        Optional<Map.Entry<String, Integer>> maxAnswer = task.getAnswers().entrySet()
+                .stream()
+                .max(Map.Entry.comparingByValue());
+        winnerAnswer = maxAnswer.isPresent() ? maxAnswer.get().getKey().split("\\:")[1] : "";
+
         taskService.save(task);
         boolean isAssignedUser = false;
         if (task.getAssignedUser() != null) {
             isAssignedUser = task.getAssignedUser() == currentUser;
         }
 
-
         model.addAttribute("isAssignedUser", isAssignedUser);
         model.addAttribute("task", task);
         model.addAttribute("members", userDTOList);
         model.addAttribute("votedFor", currentUser.getVotedFor().get(concatenatedUserTaskId));
-        model.addAttribute("voted", voted);
         model.addAttribute("answered", answered);
         model.addAttribute("optionals", answerList);
-        model.addAttribute("userAnswered", currentUser.getAnswered().get(task));
+        model.addAttribute("userAnswered", currentUser.getAnswered().get(task) == null ? null : currentUser.getAnswered().get(task).split("\\:")[1]);
         model.addAttribute("question", task.getTypeEnum() == SystemConstants.TypeEnum.QUESTION);
         model.addAttribute("winnerVote", winnerVote);
+        model.addAttribute("winnerAnswer", winnerAnswer);
+        model.addAttribute("notAssigned", task.getAssignedUser() == null);
 
         return "task";
     }
 
+    @PostMapping("/assign/{id}")
+    public String assign(@PathVariable Long id, Principal principal, HttpServletRequest request) {
+        Task task = taskService.getOne(id);
+        UserDTO userDTO = userService.findByUsername(principal.getName());
+
+        task.setAssignedUser(userDTO);
+
+        try {
+            userService.save(userDTO, false);
+            taskService.save(task);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+
+        return "redirect:/task/" + id;
+    }
+
     @PostMapping("/vote/{id}")
-    public String vote(Model model, @PathVariable Long id, Principal principal, HttpServletRequest request) {
+    public String vote(@PathVariable Long id, Principal principal, HttpServletRequest request) {
         UserDTO userDTO = userService.findByUsername(principal.getName());
         Task task = taskService.getOne(id);
         String newAnswer = request.getParameter("newAnswer");
@@ -98,42 +111,8 @@ public class TaskController {
             String finalAnswer = (newAnswer != null && !newAnswer.isEmpty()) ? newAnswer : answer;
             vote(userDTO, task, finalAnswer);
         }
-
-        //TODO nem lehet még ugyanarra a userre szavazni hozzárendelés esetén, már egyszer jó volt
-        if (request.getParameter("vote") != null) {
-            UserDTO votedUser = userService.getOne(Long.parseLong(request.getParameter("vote")));
-
-            String concatenatedUserTaskId = userDTO.getId() + ":" + task.getId();
-            UserDTO previousVote = userDTO.getVotedFor().get(concatenatedUserTaskId);
-
-            if (previousVote == null) {
-                userDTO.getVotedFor().put(concatenatedUserTaskId, votedUser);
-                VoteForUser voteForUser = getVote(votedUser, task);
-                try {
-                    taskService.save(voteForUser);
-                } catch (Exception e) {
-                    log.error(e.getMessage());
-                }
-                task.getAuthenticatedUserVoted().put(userDTO, true);
-                log.info("nem volt previous: voteForUser id:" + voteForUser.getId() + ", userid: " + voteForUser.getUserId());
-            } else {
-                if (votedUser != previousVote) {
-                    VoteForUser prevVote = taskService.getVoteByTaskAndUser(task.getId().toString(), previousVote.getId().toString());
-                    prevVote.setNumberOfVotes(prevVote.getNumberOfVotes() - 1);
-                    userDTO.getVotedFor().put(concatenatedUserTaskId, votedUser);
-                    VoteForUser voteForUser = getVote(votedUser, task);
-                    try {
-                        taskService.save(voteForUser);
-                        taskService.save(prevVote);
-                    } catch (Exception e) {
-                        log.error(e.getMessage());
-                    }
-                    log.info("volt previous: voteForUser id:" + voteForUser.getId());
-                }
-            }
-        }
         try {
-            userService.save(userDTO);
+            userService.save(userDTO, false);
             taskService.save(task);
         } catch (Exception e) {
             log.info(e.getMessage());
@@ -189,25 +168,6 @@ public class TaskController {
 
         return "redirect:/task/" + id;
 
-    }
-
-    private VoteForUser getVote(UserDTO votedUser, Task task) {
-        VoteForUser voteForUser = null;
-        for (VoteForUser iterated : task.getVotes()) {
-            if (Long.parseLong(iterated.getUserId()) == votedUser.getId()) {
-                voteForUser = iterated;
-            }
-        }
-        if (voteForUser == null) {
-            voteForUser = new VoteForUser();
-            voteForUser.setUserId(votedUser.getId().toString());
-            voteForUser.setTaskId(task.getId().toString());
-            voteForUser.setNumberOfVotes(1);
-            task.getVotes().add(voteForUser);
-        } else {
-            voteForUser.setNumberOfVotes(voteForUser.getNumberOfVotes() + 1);
-        }
-        return voteForUser;
     }
 
     /**

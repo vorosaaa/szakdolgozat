@@ -1,6 +1,8 @@
 version: '3.3'
 services:
   app:
+    environment:
+        TZ: "CET"
     build: ./app
     working_dir: /app
     volumes:
@@ -16,6 +18,7 @@ services:
     container_name: db_container
     image: mysql/mysql-server:5.7
     environment:
+      TZ: "CET"
       MYSQL_DATABASE: db
       MYSQL_USER: user
       MYSQL_PASSWORD: password
@@ -24,6 +27,3 @@ services:
     ports:
       - "3306:3306"
     restart: always
-
-
-

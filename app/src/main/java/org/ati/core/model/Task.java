@@ -71,11 +71,6 @@ public class Task {
     @ElementCollection
     @Getter
     @Setter
-    private Set<VoteForUser> votes;
-
-    @ElementCollection
-    @Getter
-    @Setter
     private Map<UserDTO, Boolean> authenticatedUserVoted;
 
     @Getter
@@ -90,7 +85,6 @@ public class Task {
         this.comments = new HashSet<>();
         this.requiredSkills = new HashSet<>();
         this.optionalAnswers = new HashSet<>();
-        this.votes = new HashSet<>();
         this.answers = new HashMap<>();
         this.authenticatedUserVoted = new HashMap<>();
         this.voteFinished = false;

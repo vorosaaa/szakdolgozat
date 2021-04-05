@@ -75,7 +75,7 @@
         <div class="tasks__task" th:each="task : ${taskList}">
             <div class="login-title task--title" th:text="${task.name}"></div>
             <div class="login-field task--field">
-                <div th:if="${task.voteFinished}">Assigned user:
+                <div th:if="${task.voteFinished} and ${task.assignedUser} != null and ${task.typeEnum} != ${T(org.ati.core.model.SystemConstants.TypeEnum).QUESTION}">Assigned user:
                     <p th:text="${task.assignedUser.name}"></p>
                 </div>
                 <div th:switch="${task.statusEnum}">

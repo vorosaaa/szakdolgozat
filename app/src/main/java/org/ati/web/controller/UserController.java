@@ -79,7 +79,7 @@ public class UserController {
         if (errors.hasErrors()) {
             return "myprofile";
         }
-        userService.save(user);
+        userService.save(user, false);
         SecurityContextHolder.getContext().setAuthentication(null);
 
         return "redirect:/welcome";
@@ -93,7 +93,7 @@ public class UserController {
             return "registration";
         }
 
-        userService.save(userForm);
+        userService.save(userForm, true);
         securityService.autoLogin(userForm.getUsername(), userForm.getMatchingPassword());
 
         return "redirect:/welcome";

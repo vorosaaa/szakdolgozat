@@ -1,6 +1,5 @@
 package org.ati.core.service;
 
-import org.ati.core.model.ConfirmationToken;
 import org.ati.core.model.UserDTO;
 import org.ati.core.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +29,8 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public UserDTO save(UserDTO user) {
-        if (user.getId() == null) {
+    public UserDTO save(UserDTO user, boolean pwUpdate) {
+        if (pwUpdate) {
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         }
         return userRepository.save(user);
