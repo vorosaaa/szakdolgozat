@@ -566,7 +566,7 @@ code {
     }
 }
 
-@media screen and (min-width: 400px) {
+@media screen and (max-width: 400px) {
     .login {
         width: 100%;
         height: 100%;
