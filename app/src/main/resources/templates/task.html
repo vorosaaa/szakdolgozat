@@ -77,10 +77,9 @@
                 <div  class="container">
                     <div class="be-comment-block">
                         <form th:if="${task.voteFinished}" class="form" enctype="utf8" >
-                            <div class="inputGroup" th:each="answer : ${optionals}">
-                                <input th:checked="${winnerAnswer} == ${answer}"
-                                       th:name="answer" disabled type="radio">
-                                <label th:for="${answer}"><p th:text="${answer}"></p></label>
+                            <div class="inputGroup" th:each="answer : ${task.answers}">
+                                <input th:name="${answer.key}" disabled type="radio">
+                                <label style="background-color: lightgrey" th:for="${answer.key}"><p th:text="${#strings.substring(answer.key,2, #strings.length(answer.key))} + ': ' + ${answer.value}"></p></label>
                             </div>
                         </form>
                         <div th:each="comment : ${task.comments}" class="be-comment">

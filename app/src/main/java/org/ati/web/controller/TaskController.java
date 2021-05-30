@@ -54,13 +54,6 @@ public class TaskController {
         boolean answered = !StringUtils.isEmpty(currentUser.getAnswered().get(task));
         String concatenatedUserTaskId = currentUser.getId() + ":" + task.getId();
         task.setVoteFinished(LocalDateTime.now().atOffset(ZoneOffset.UTC).isAfter(task.getValidTo().atOffset(ZoneOffset.UTC)));
-        String winnerVote = "";
-        String winnerAnswer = "";
-
-        Optional<Map.Entry<String, Integer>> maxAnswer = task.getAnswers().entrySet()
-                .stream()
-                .max(Map.Entry.comparingByValue());
-        winnerAnswer = maxAnswer.isPresent() ? maxAnswer.get().getKey().split("\\:")[1] : "";
 
         taskService.save(task);
         boolean isAssignedUser = false;
@@ -76,8 +69,6 @@ public class TaskController {
         model.addAttribute("optionals", answerList);
         model.addAttribute("userAnswered", currentUser.getAnswered().get(task) == null ? null : currentUser.getAnswered().get(task).split("\\:")[1]);
         model.addAttribute("question", task.getTypeEnum() == SystemConstants.TypeEnum.QUESTION);
-        model.addAttribute("winnerVote", winnerVote);
-        model.addAttribute("winnerAnswer", winnerAnswer);
         model.addAttribute("notAssigned", task.getAssignedUser() == null);
 
         return "task";
