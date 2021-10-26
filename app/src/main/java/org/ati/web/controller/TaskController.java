@@ -186,7 +186,7 @@ public class TaskController {
                 task.getAnswers().replace(previousAnswer, task.getAnswers().get(previousAnswer) - 1);
                 userDTO.getAnswered().replace(task, concatenatedAnswerTask);
                 if (task.getAnswers().containsKey(concatenatedAnswerTask)) {
-                    task.getAnswers().replace(concatenatedAnswerTask, task.getAnswers().get(answer) + 1);
+                    task.getAnswers().replace(concatenatedAnswerTask, task.getAnswers().get(concatenatedAnswerTask) + 1);
                 } else {
                     task.getAnswers().put(concatenatedAnswerTask, 1);
                 }
