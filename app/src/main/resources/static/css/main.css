@@ -112,7 +112,7 @@ div.margined {
  /******************REGISTRATION PAGE*********************/
 
 .register {
-    height: 20%;
+    height: auto;
 }
 
 .reg_title {
